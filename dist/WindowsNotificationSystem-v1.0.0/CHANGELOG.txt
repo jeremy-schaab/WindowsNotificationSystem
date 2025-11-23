@@ -1,0 +1,34 @@
+# Windows Notification System - Version 1.0.0
+
+Release Date: 2025-11-23
+
+## Package Contents
+
+- **bin/NotifyUser.exe** - Windows notification executable (57.65 MB)
+- **PowerShell/** - PowerShell module for easy integration
+- **README.md** - Installation and usage instructions
+
+## System Requirements
+
+- Windows 10 (version 1809 or later) OR Windows 11
+- No .NET runtime required (self-contained)
+
+## Installation
+
+See README.md for detailed installation instructions.
+
+## Quick Start
+
+1. Add bin/ to your PATH or use absolute path
+2. Import PowerShell module:
+   ```powershell
+   Import-Module .\PowerShell\NotifyUser.psm1
+   ```
+3. Display a notification:
+   ```powershell
+   Show-Notification -Title "Hello" -Message "World"
+   ```
+
+## Support
+
+For issues, please visit: https://github.com/yourusername/WindowsNotificationSystem

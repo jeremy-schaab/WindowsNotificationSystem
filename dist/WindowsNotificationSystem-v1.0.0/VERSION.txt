@@ -1,0 +1,4 @@
+Version: 1.0.0
+Build Date: 2025-11-23 10:39:49
+Target Platform: Windows x64
+.NET Version: 9.0

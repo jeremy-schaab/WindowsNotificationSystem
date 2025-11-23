@@ -1,0 +1,3 @@
+45EDB606333D6020AC74C5EBBA0DBCEC5B1E22E0627D9D0FF4BE84ECEB638453  C:\Users\jschaab\source\repos\GitHub\WindowsNotificationSystem\dist\WindowsNotificationSystem-v1.0.0\bin\NotifyUser.exe
+8E396679FFB22A18916B16A4C6FC004CC5DAE921B1D931728FFC741F1A44FEE5  C:\Users\jschaab\source\repos\GitHub\WindowsNotificationSystem\dist\WindowsNotificationSystem-v1.0.0\PowerShell\NotifyUser.psd1
+521905FEB8554C644CC59FBCCEB56F79FE4A48619A302622DA9AEBE7FD26617C  C:\Users\jschaab\source\repos\GitHub\WindowsNotificationSystem\dist\WindowsNotificationSystem-v1.0.0\PowerShell\NotifyUser.psm1
