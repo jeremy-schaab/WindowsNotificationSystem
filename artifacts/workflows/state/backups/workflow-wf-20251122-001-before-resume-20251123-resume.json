@@ -1,0 +1,108 @@
+{
+  "workflow_id": "wf-20251122-001",
+  "workflow_name": "windows-notification-system",
+  "workflow_file": "artifacts/workflows/windows-notification-workflow.yaml",
+  "status": "paused",
+  "start_time": "2025-11-22T10:00:00Z",
+  "pause_time": "2025-11-22T10:35:00Z",
+  "current_phase": "construction",
+  "current_step": 7,
+  "total_steps": 29,
+  "steps_completed": 7,
+  "steps_remaining": 22,
+  "variables": {
+    "project_name": "WindowsNotificationSystem",
+    "dotnet_version": "9.0",
+    "ui_framework": "console-wpf-hybrid",
+    "notification_types": ["toast", "window"],
+    "audio_support": true,
+    "single_file_executable": true,
+    "self_contained": true,
+    "code_coverage_threshold": 70
+  },
+  "completed_steps": [
+    {
+      "step_id": "start-intent",
+      "name": "Clarify Intent",
+      "status": "completed",
+      "completed_at": "2025-11-22T10:05:00Z",
+      "output": "artifacts/inception/intent-20251122-001.md"
+    },
+    {
+      "step_id": "create-units",
+      "name": "Decompose into Units",
+      "status": "completed",
+      "completed_at": "2025-11-22T10:12:00Z",
+      "output": "artifacts/inception/units-20251122-001.md"
+    },
+    {
+      "step_id": "plan-bolt-core",
+      "name": "Plan Core Notification Bolt",
+      "status": "completed",
+      "completed_at": "2025-11-22T10:18:00Z",
+      "output": "artifacts/inception/bolt-core-notification-plan-20251122-001.md"
+    },
+    {
+      "step_id": "plan-bolt-cli",
+      "name": "Plan CLI Bolt",
+      "status": "completed",
+      "completed_at": "2025-11-22T10:23:00Z",
+      "output": "artifacts/inception/bolt-cli-plan-20251122-001.md"
+    },
+    {
+      "step_id": "validate-inception",
+      "name": "Validate Inception Phase",
+      "status": "completed",
+      "completed_at": "2025-11-22T10:25:00Z"
+    },
+    {
+      "step_id": "domain-model",
+      "name": "Create Domain Model",
+      "status": "completed",
+      "completed_at": "2025-11-22T10:30:00Z",
+      "output": "artifacts/construction/domain-model-20251122-001.md"
+    },
+    {
+      "step_id": "logical-design",
+      "name": "Create Logical Design",
+      "status": "completed",
+      "completed_at": "2025-11-22T10:35:00Z",
+      "output": "artifacts/construction/logical-design-20251122-001.md"
+    }
+  ],
+  "next_steps": [
+    {
+      "step_id": "create-solution",
+      "name": "Create .NET Solution",
+      "status": "pending"
+    },
+    {
+      "step_id": "create-wpf-project",
+      "name": "Create WPF Application Project",
+      "status": "pending"
+    }
+  ],
+  "artifacts_created": [
+    "artifacts/inception/intent-20251122-001.md",
+    "artifacts/inception/units-20251122-001.md",
+    "artifacts/inception/bolt-core-notification-plan-20251122-001.md",
+    "artifacts/inception/bolt-cli-plan-20251122-001.md",
+    "artifacts/construction/domain-model-20251122-001.md",
+    "artifacts/construction/logical-design-20251122-001.md"
+  ],
+  "phase_progress": {
+    "inception": {
+      "status": "completed",
+      "steps_completed": 5,
+      "total_steps": 5
+    },
+    "construction": {
+      "status": "in_progress",
+      "steps_completed": 2,
+      "total_steps": 22
+    }
+  },
+  "pause_reason": "User requested pause",
+  "resume_from_step": "create-solution",
+  "backup_created_at": "2025-11-23T00:00:00Z"
+}

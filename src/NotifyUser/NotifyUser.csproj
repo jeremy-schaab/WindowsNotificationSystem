@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
+    <LangVersion>13.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PlatformTarget>x64</PlatformTarget>
+
+    <!-- Single-file deployment -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <PublishTrimmed>false</PublishTrimmed>
+    <!-- Trimming disabled due to Microsoft.Toolkit.Uwp.Notifications COM requirements -->
+
+    <!-- Performance optimizations -->
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <TieredCompilation>true</TieredCompilation>
+    <TieredCompilationQuickJit>true</TieredCompilationQuickJit>
+
+    <!-- Size optimizations -->
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+
+    <!-- COM support for Windows toast notifications -->
+    <EnableComSupport>true</EnableComSupport>
+
+    <!-- Application metadata -->
+    <AssemblyName>NotifyUser</AssemblyName>
+    <Product>Windows Notification System</Product>
+    <Version>1.0.0</Version>
+    <Description>Display Windows notifications from PowerShell scripts</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NotifyUser.Application\NotifyUser.Application.csproj" />
+    <ProjectReference Include="..\NotifyUser.Infrastructure\NotifyUser.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+  </ItemGroup>
+
+  <!-- Trimming warnings suppression (if needed) -->
+  <ItemGroup>
+    <TrimmerRootAssembly Include="NotifyUser" />
+    <TrimmerRootAssembly Include="Microsoft.Toolkit.Uwp.Notifications" />
+  </ItemGroup>
+
+  <!-- Runtime configuration for COM support -->
+  <ItemGroup>
+    <RuntimeHostConfigurationOption Include="System.Runtime.InteropServices.BuiltInComInterop.IsSupported" Value="true" />
+  </ItemGroup>
+
+</Project>

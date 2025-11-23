@@ -1,0 +1,737 @@
+# Windows Notification System Workflow
+# Type: Greenfield Utility Tool
+# Purpose: PowerShell-callable Windows notification executable for Claude Code automation
+# Target: .NET 10, C# 13, WPF or WinForms
+
+workflow: windows-notification-system
+version: 1.0.0
+description: "Complete end-to-end workflow for building a Windows desktop notification utility that Claude Code can trigger via PowerShell during long-running automation tasks"
+language: dotnet
+category: greenfield
+
+config:
+  allow_parallel: true
+  max_retries: 2
+  timeout_minutes: 120
+  retry_backoff: linear
+  continue_on_warning: true
+  fail_on_test_failure: true
+
+variables:
+  # Project Configuration
+  project_name:
+    type: string
+    value: "WindowsNotificationSystem"
+    description: "Main project name"
+
+  dotnet_version:
+    type: string
+    value: "9.0"
+    description: "Target .NET version (using .NET 10 per user guidelines)"
+
+  ui_framework:
+    type: string
+    value: "wpf"
+    description: "UI framework choice - WPF for rich notifications with modern UI"
+    allowed_values: ["wpf", "winforms", "console"]
+
+  # Notification Features
+  notification_types:
+    type: array
+    value: ["toast", "balloon", "window"]
+    description: "Types of notifications to support"
+
+  audio_support:
+    type: boolean
+    value: true
+    description: "Enable audio/sound notifications"
+
+  duration_configurable:
+    type: boolean
+    value: true
+    description: "Allow configurable display duration"
+
+  # PowerShell Integration
+  cli_arguments:
+    type: array
+    value: ["--message", "--title", "--type", "--duration", "--sound"]
+    description: "Command-line arguments for PowerShell invocation"
+
+  exit_code_behavior:
+    type: string
+    value: "immediate"
+    description: "Exit code behavior for PowerShell integration"
+    allowed_values: ["immediate", "wait-for-close"]
+
+  # Packaging
+  single_file_executable:
+    type: boolean
+    value: true
+    description: "Publish as single-file EXE for easy distribution"
+
+  self_contained:
+    type: boolean
+    value: true
+    description: "Include .NET runtime (no dependency on installed .NET)"
+
+  # Testing
+  test_framework:
+    type: string
+    value: "xunit"
+    description: "Unit testing framework"
+
+  include_integration_tests:
+    type: boolean
+    value: false
+    description: "Skip integration tests for simple utility"
+
+  code_coverage_threshold:
+    type: number
+    value: 70
+    description: "Minimum code coverage percentage"
+
+  # Deployment
+  deployment_location:
+    type: string
+    value: "local"
+    description: "Deployment target (local development tool)"
+
+phases:
+  - name: inception
+    description: "Project planning and requirements clarification"
+    steps:
+      - id: start-intent
+        name: "Clarify Intent"
+        description: "Create Intent document with detailed requirements"
+        command: ai-dlc:start-intent
+        args:
+          intent_name: "Windows Notification System for Claude Code Automation"
+          intent_type: "utility-tool"
+        approval: required
+        approval_message: |
+          Intent Clarification Complete
+
+          This workflow will create a Windows notification utility that:
+          - Displays toast notifications, balloon tips, or desktop windows
+          - Can be called from PowerShell scripts during Claude Code automation
+          - Supports text messages, titles, durations, and optional sounds
+          - Packages as a single-file EXE with no external dependencies
+
+          Technology Stack:
+          - .NET 10 (C# 13)
+          - WPF for modern, rich notification UI
+          - Windows 10/11 native notification APIs
+          - Single-file self-contained EXE
+
+          PowerShell Usage Example:
+          .\NotifyUser.exe --title "Build Complete" --message "Your automation finished successfully" --type toast --duration 5 --sound success
+
+          Do you approve this Intent and want to proceed?
+        approval_timeout_minutes: 60
+        on_timeout: pause
+        outputs:
+          - "artifacts/inception/intent-windows-notification.md"
+
+      - id: create-units
+        name: "Decompose into Units"
+        description: "Break down Intent into development Units"
+        command: ai-dlc:create-units
+        depends_on: [start-intent]
+        args:
+          intent_artifact: "${outputs.start-intent.intent_artifact}"
+          decomposition_approach: "feature-based"
+        expected_units:
+          - name: "NotificationCore"
+            description: "Core notification engine and Windows API integration"
+          - name: "CommandLineInterface"
+            description: "Argument parsing and PowerShell integration"
+          - name: "NotificationUI"
+            description: "WPF UI components for toast/window display"
+          - name: "AudioSupport"
+            description: "Sound playback for audio notifications"
+        outputs:
+          - "artifacts/inception/units-windows-notification.md"
+
+      - id: plan-bolt-core
+        name: "Plan Core Notification Bolt"
+        description: "Create Bolt plan for notification core functionality"
+        command: ai-dlc:plan-bolt
+        depends_on: [create-units]
+        args:
+          unit_name: "NotificationCore"
+          bolt_scope: "Windows notification API integration, toast notifications, balloon tips"
+        outputs:
+          - "artifacts/inception/bolt-notification-core-plan.md"
+
+      - id: plan-bolt-cli
+        name: "Plan CLI Bolt"
+        description: "Create Bolt plan for command-line interface"
+        command: ai-dlc:plan-bolt
+        depends_on: [create-units]
+        args:
+          unit_name: "CommandLineInterface"
+          bolt_scope: "Argument parsing, PowerShell integration, exit codes"
+        outputs:
+          - "artifacts/inception/bolt-cli-plan.md"
+
+      - id: validate-inception
+        name: "Validate Inception Phase"
+        description: "Verify all Inception artifacts are complete"
+        command: ai-dlc:validate-phase
+        depends_on: [plan-bolt-core, plan-bolt-cli]
+        args:
+          phase: "inception"
+          required_artifacts:
+            - "artifacts/inception/intent-windows-notification.md"
+            - "artifacts/inception/units-windows-notification.md"
+            - "artifacts/inception/bolt-notification-core-plan.md"
+            - "artifacts/inception/bolt-cli-plan.md"
+        validation:
+          type: artifact_check
+          on_failure: fail
+
+  - name: construction
+    description: "Build notification system with code generation and testing"
+    steps:
+      - id: domain-model
+        name: "Create Domain Model"
+        description: "Design domain model for notification system"
+        command: ai-dlc:domain-model
+        depends_on: [validate-inception]
+        args:
+          units: ["NotificationCore", "CommandLineInterface", "NotificationUI", "AudioSupport"]
+          modeling_approach: "simple-object-model"
+          bounded_contexts: ["Notification", "CLI", "Audio"]
+        outputs:
+          - "artifacts/construction/domain-model-notification-system.md"
+
+      - id: logical-design
+        name: "Create Logical Design"
+        description: "Design component architecture and interactions"
+        command: ai-dlc:logical-design
+        depends_on: [domain-model]
+        args:
+          domain_model: "${outputs.domain-model.domain_model}"
+          design_patterns: ["factory", "strategy", "command"]
+          technology_stack:
+            - ".NET 10"
+            - "WPF"
+            - "System.CommandLine"
+            - "Windows.UI.Notifications"
+        outputs:
+          - "artifacts/construction/logical-design-notification-system.md"
+
+      - id: create-solution
+        name: "Create .NET Solution"
+        description: "Initialize .NET solution and project structure"
+        command: dotnet
+        depends_on: [logical-design]
+        args:
+          - new
+          - sln
+          - -n
+          - WindowsNotificationSystem
+        working_directory: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem"
+        validation:
+          type: file_exists
+          path: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\WindowsNotificationSystem.sln"
+
+      - id: create-wpf-project
+        name: "Create WPF Application Project"
+        description: "Create main WPF application project"
+        command: dotnet
+        depends_on: [create-solution]
+        args:
+          - new
+          - wpf
+          - -n
+          - NotifyUser
+          - -o
+          - ./src/NotifyUser
+          - --framework
+          - net9.0
+        working_directory: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem"
+        validation:
+          type: file_exists
+          path: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\src\\NotifyUser\\NotifyUser.csproj"
+
+      - id: add-project-to-solution
+        name: "Add WPF Project to Solution"
+        description: "Link WPF project to solution"
+        command: dotnet
+        depends_on: [create-wpf-project]
+        args:
+          - sln
+          - add
+          - ./src/NotifyUser/NotifyUser.csproj
+        working_directory: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem"
+
+      - id: create-test-project
+        name: "Create Test Project"
+        description: "Create xUnit test project"
+        command: dotnet
+        depends_on: [create-solution]
+        args:
+          - new
+          - xunit
+          - -n
+          - NotifyUser.Tests
+          - -o
+          - ./tests/NotifyUser.Tests
+          - --framework
+          - net9.0
+        working_directory: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem"
+        validation:
+          type: file_exists
+          path: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\tests\\NotifyUser.Tests\\NotifyUser.Tests.csproj"
+
+      - id: add-test-project-to-solution
+        name: "Add Test Project to Solution"
+        description: "Link test project to solution"
+        command: dotnet
+        depends_on: [create-test-project]
+        args:
+          - sln
+          - add
+          - ./tests/NotifyUser.Tests/NotifyUser.Tests.csproj
+        working_directory: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem"
+
+      - id: add-project-reference
+        name: "Add Project Reference to Tests"
+        description: "Reference main project from test project"
+        command: dotnet
+        depends_on: [add-project-to-solution, add-test-project-to-solution]
+        args:
+          - add
+          - ./tests/NotifyUser.Tests/NotifyUser.Tests.csproj
+          - reference
+          - ./src/NotifyUser/NotifyUser.csproj
+        working_directory: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem"
+
+      - id: install-nuget-packages
+        name: "Install Required NuGet Packages"
+        description: "Add necessary dependencies"
+        command: ai-dlc:install-packages
+        depends_on: [add-project-reference]
+        args:
+          project: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\src\\NotifyUser\\NotifyUser.csproj"
+          packages:
+            - package: "System.CommandLine"
+              version: "2.0.0-beta4.22272.1"
+            - package: "Microsoft.Toolkit.Uwp.Notifications"
+              version: "7.1.3"
+            - package: "NAudio"
+              version: "2.2.1"
+        retry: 2
+        on_failure:
+          fallback:
+            - command: echo
+              args: ["Warning: Some packages may need manual installation"]
+
+      - id: install-test-packages
+        name: "Install Test Dependencies"
+        description: "Add testing packages"
+        command: ai-dlc:install-packages
+        depends_on: [add-project-reference]
+        args:
+          project: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\tests\\NotifyUser.Tests\\NotifyUser.Tests.csproj"
+          packages:
+            - package: "FluentAssertions"
+              version: "6.12.0"
+            - package: "Moq"
+              version: "4.20.70"
+            - package: "coverlet.collector"
+              version: "6.0.0"
+
+      - id: generate-code
+        name: "Generate Application Code"
+        description: "Generate C# code for notification system"
+        command: ai-dlc:generate-code
+        depends_on: [logical-design, install-nuget-packages]
+        args:
+          logical_design: "${outputs.logical-design.logical_design}"
+          output_directory: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\src\\NotifyUser"
+          language: "csharp"
+          framework: "wpf"
+          code_style: "modern-csharp-13"
+          features:
+            - "command-line-parsing"
+            - "toast-notifications"
+            - "wpf-windows"
+            - "audio-playback"
+            - "exit-codes"
+        retry: 2
+        retry_backoff: exponential
+        fallback:
+          - command: ai-dlc:generate-code
+            args:
+              template: "console-app-basic"
+              output_directory: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\src\\NotifyUser"
+        outputs:
+          - "src/NotifyUser/**/*.cs"
+
+      - id: build-unit-tests
+        name: "Generate Unit Tests"
+        description: "Create unit tests for notification logic"
+        command: ai-dlc:build-tests
+        depends_on: [generate-code, install-test-packages]
+        args:
+          project_path: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\src\\NotifyUser"
+          test_project_path: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\tests\\NotifyUser.Tests"
+          test_type: "unit"
+          test_framework: "xunit"
+          coverage_target: ${code_coverage_threshold}
+          focus_areas:
+            - "NotificationService"
+            - "CommandLineParser"
+            - "NotificationFactory"
+        outputs:
+          - "tests/NotifyUser.Tests/**/*Tests.cs"
+
+      - id: build-solution
+        name: "Build Solution"
+        description: "Compile entire solution"
+        command: dotnet
+        depends_on: [generate-code, build-unit-tests]
+        args:
+          - build
+          - WindowsNotificationSystem.sln
+          - --configuration
+          - Release
+          - --verbosity
+          - minimal
+        working_directory: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem"
+        validation:
+          type: exit_code
+          expected: 0
+        on_failure:
+          rollback: true
+          notify: true
+
+      - id: run-unit-tests
+        name: "Run Unit Tests"
+        description: "Execute unit tests with code coverage"
+        command: dotnet
+        depends_on: [build-solution]
+        args:
+          - test
+          - ./tests/NotifyUser.Tests/NotifyUser.Tests.csproj
+          - --configuration
+          - Release
+          - --collect:"XPlat Code Coverage"
+          - --logger
+          - "console;verbosity=normal"
+          - --
+          - RunConfiguration.CollectSourceInformation=true
+        working_directory: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem"
+        validation:
+          type: exit_code
+          expected: 0
+        on_failure:
+          action: fail
+          message: "Unit tests failed - code quality gate not met"
+
+      - id: verify-code-coverage
+        name: "Verify Code Coverage"
+        description: "Check code coverage meets threshold"
+        command: ai-dlc:verify-coverage
+        depends_on: [run-unit-tests]
+        args:
+          coverage_threshold: ${code_coverage_threshold}
+          test_results_directory: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\tests\\NotifyUser.Tests\\TestResults"
+        validation:
+          type: threshold
+          minimum: ${code_coverage_threshold}
+        continue_on_failure: true
+
+      - id: publish-executable
+        name: "Publish Single-File EXE"
+        description: "Create self-contained single-file executable"
+        command: dotnet
+        depends_on: [run-unit-tests]
+        args:
+          - publish
+          - ./src/NotifyUser/NotifyUser.csproj
+          - --configuration
+          - Release
+          - --runtime
+          - win-x64
+          - --self-contained
+          - "true"
+          - --output
+          - ./publish
+          - /p:PublishSingleFile=true
+          - /p:IncludeNativeLibrariesForSelfExtract=true
+          - /p:EnableCompressionInSingleFile=true
+        working_directory: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem"
+        validation:
+          type: file_exists
+          path: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\publish\\NotifyUser.exe"
+        outputs:
+          - "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\publish\\NotifyUser.exe"
+
+      - id: test-powershell-integration
+        name: "Test PowerShell Integration"
+        description: "Verify executable works from PowerShell"
+        command: ai-dlc:test-cli
+        depends_on: [publish-executable]
+        args:
+          executable: "${outputs.publish-executable.executable_path}"
+          test_cases:
+            - args: ["--help"]
+              expected_exit_code: 0
+            - args: ["--title", "Test", "--message", "Hello from workflow"]
+              expected_exit_code: 0
+            - args: ["--type", "toast", "--duration", "3"]
+              expected_exit_code: 0
+        retry: 1
+
+      - id: validate-construction
+        name: "Validate Construction Phase"
+        description: "Verify all Construction deliverables"
+        command: ai-dlc:validate-phase
+        depends_on: [publish-executable, test-powershell-integration]
+        args:
+          phase: "construction"
+          required_artifacts:
+            - "artifacts/construction/domain-model-notification-system.md"
+            - "artifacts/construction/logical-design-notification-system.md"
+          required_outputs:
+            - "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\publish\\NotifyUser.exe"
+            - "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\WindowsNotificationSystem.sln"
+        validation:
+          type: comprehensive
+          on_failure: fail
+
+      - id: generate-usage-documentation
+        name: "Generate README and Usage Guide"
+        description: "Create user documentation"
+        command: ai-dlc:generate-docs
+        depends_on: [validate-construction]
+        args:
+          doc_type: "readme"
+          output_path: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\README.md"
+          include_sections:
+            - "overview"
+            - "installation"
+            - "usage-examples"
+            - "powershell-integration"
+            - "command-line-arguments"
+            - "troubleshooting"
+          examples:
+            - description: "Simple toast notification"
+              command: ".\\NotifyUser.exe --title 'Build Complete' --message 'Your project built successfully'"
+            - description: "Toast with custom duration and sound"
+              command: ".\\NotifyUser.exe --title 'Test Run' --message 'All tests passed' --duration 10 --sound success"
+            - description: "Desktop window notification"
+              command: ".\\NotifyUser.exe --type window --title 'Important' --message 'Review required'"
+        outputs:
+          - "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\README.md"
+
+      - id: create-powershell-wrapper
+        name: "Create PowerShell Wrapper Functions"
+        description: "Generate PowerShell module for easier integration"
+        command: ai-dlc:generate-file
+        depends_on: [validate-construction]
+        args:
+          template: "powershell-module"
+          output: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\NotifyUser.psm1"
+          functions:
+            - name: "Show-Notification"
+              parameters: ["Title", "Message", "Type", "Duration", "Sound"]
+              description: "Display a Windows notification"
+            - name: "Show-ToastNotification"
+              parameters: ["Title", "Message", "Duration"]
+              description: "Quick toast notification"
+            - name: "Show-SuccessNotification"
+              parameters: ["Message"]
+              description: "Green checkmark success notification"
+            - name: "Show-ErrorNotification"
+              parameters: ["Message"]
+              description: "Red X error notification"
+
+approval_gates:
+  - step_id: start-intent
+    type: manual
+    required: true
+    message: "Review Intent and approve to proceed with development"
+    timeout_minutes: 60
+
+  - step_id: build-solution
+    type: automatic
+    condition: "exit_code == 0"
+    on_failure: rollback
+
+  - step_id: run-unit-tests
+    type: automatic
+    condition: "exit_code == 0 && coverage >= ${code_coverage_threshold}"
+    on_failure: fail
+
+  - step_id: publish-executable
+    type: automatic
+    condition: "file_exists(executable_path)"
+    on_failure: fail
+
+error_handling:
+  global_retry_strategy:
+    max_attempts: 2
+    backoff: linear
+    backoff_multiplier: 1.5
+
+  step_specific_overrides:
+    - step_id: install-nuget-packages
+      max_attempts: 3
+      backoff: exponential
+    - step_id: generate-code
+      max_attempts: 2
+      fallback_enabled: true
+
+  rollback_strategy:
+    on_failure:
+      - delete_generated_code: true
+      - preserve_artifacts: true
+      - cleanup_nuget_cache: false
+
+notifications:
+  on_start:
+    message: "Starting Windows Notification System workflow"
+    channels: ["console"]
+
+  on_phase_complete:
+    message: "Phase ${phase_name} completed successfully"
+    channels: ["console"]
+
+  on_complete:
+    message: |
+      Windows Notification System created successfully!
+
+      Executable Location: ${outputs.publish-executable.executable_path}
+
+      Quick Start:
+      1. Copy NotifyUser.exe to a location in your PATH
+      2. Test: .\NotifyUser.exe --title "Test" --message "Hello World"
+      3. Import PowerShell module: Import-Module .\NotifyUser.psm1
+      4. Use from Claude Code: Show-Notification -Title "Done" -Message "Task complete"
+    channels: ["console"]
+
+  on_failure:
+    message: "Workflow failed at step: ${failed_step_id} - Error: ${error_message}"
+    channels: ["console"]
+    include_stack_trace: true
+
+outputs:
+  executable_path:
+    value: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\publish\\NotifyUser.exe"
+    description: "Path to published single-file executable"
+
+  powershell_module:
+    value: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\NotifyUser.psm1"
+    description: "PowerShell module for easy integration"
+
+  solution_file:
+    value: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\WindowsNotificationSystem.sln"
+    description: "Visual Studio solution file"
+
+  readme:
+    value: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\README.md"
+    description: "User documentation and usage guide"
+
+  test_results:
+    value: "C:\\Users\\jschaab\\source\\repos\\GitHub\\WindowsNotificationSystem\\tests\\NotifyUser.Tests\\TestResults"
+    description: "Unit test results and coverage reports"
+
+metadata:
+  total_steps: 29
+  estimated_duration_minutes: 45
+  complexity: "medium"
+  workflow_type: "greenfield-utility"
+  phases_included: ["inception", "construction"]
+  phases_skipped: ["operations"]
+  skip_reason: "Developer tool, no production deployment needed"
+
+technology_recommendations:
+  primary_ui_framework: "Single-File Self-Contained EXE"
+  rationale: |
+    Single-file EXE because:
+    - No .NET runtime dependency
+    - Easy to distribute and use
+    - Works on any Windows 10/11 machine
+    - Simple PowerShell integration
+
+  alternative_approaches:
+    - name: "Pure PowerShell Script"
+      pros: ["No compilation needed", "Easy to modify"]
+      cons: ["Limited UI capabilities", "Slower performance", "Less reliable"]
+      verdict: "Not recommended - lacks rich notification features"
+
+    - name: "WinForms Application"
+      pros: ["Simpler than WPF", "Lightweight"]
+      cons: ["Legacy UI framework", "Limited styling", "Poor toast support"]
+      verdict: "WPF preferred for modern notifications"
+
+    - name: "Console App with Windows API P/Invoke"
+      pros: ["Small size", "Fast startup"]
+      cons: ["Complex native API calls", "More code to maintain"]
+      verdict: "WPF with Toolkit.Uwp.Notifications is easier"
+
+execution_instructions:
+  manual_execution: |
+    To run this workflow manually:
+
+    1. Execute via AI-DLC command:
+       /ai-dlc:run-workflow windows-notification-workflow.yaml
+
+    2. The workflow will:
+       - Create Intent and Units artifacts
+       - Generate domain model and logical design
+       - Create .NET solution with WPF project
+       - Generate C# code for notification system
+       - Build and test the application
+       - Publish single-file EXE
+       - Create PowerShell wrapper module
+       - Generate documentation
+
+    3. After completion, test with:
+       .\publish\NotifyUser.exe --title "Test" --message "Hello from Windows Notification System"
+
+  integration_with_claude_code: |
+    To use from Claude Code automation:
+
+    PowerShell Example:
+    ```powershell
+    # At start of long operation
+    & "C:\path\to\NotifyUser.exe" --title "Build Started" --message "Building your project..." --type toast
+
+    # During operation
+    dotnet build
+    if ($LASTEXITCODE -eq 0) {
+        & "C:\path\to\NotifyUser.exe" --title "Success" --message "Build completed successfully" --sound success
+    } else {
+        & "C:\path\to\NotifyUser.exe" --title "Error" --message "Build failed" --sound error
+    }
+    ```
+
+    PowerShell Module Example:
+    ```powershell
+    Import-Module C:\path\to\NotifyUser.psm1
+
+    Show-Notification -Title "Task Complete" -Message "Your automation finished"
+    Show-SuccessNotification -Message "All tests passed"
+    Show-ErrorNotification -Message "Deployment failed"
+    ```
+
+next_steps:
+  - action: "Review workflow configuration"
+    description: "Examine the workflow YAML and customize if needed"
+
+  - action: "Execute workflow"
+    description: "Run: /ai-dlc:run-workflow artifacts/workflows/windows-notification-workflow.yaml"
+
+  - action: "Test executable"
+    description: "After completion, test the generated NotifyUser.exe from PowerShell"
+
+  - action: "Integrate with Claude Code"
+    description: "Add notification calls to your PowerShell automation scripts"
+
+  - action: "Optional enhancements"
+    description: "Consider adding: custom icons, progress bars, interactive buttons, notification history"
